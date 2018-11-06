@@ -1,0 +1,21 @@
+library(readr)
+library(carData)
+library(qqplotr)
+library(seqinr)
+library(gplots)
+library(car)
+petbirds <- read_table2("C:/Users/User/Desktop/Statistik/3.Semester/Projekt/petbirds.txt")
+# Dataframe
+attach(petbirds)
+table(Gruppe)
+table(Vogel, Gruppe)
+
+# K = kontrolle
+# A = Fall
+pA <- 98/(98+141); pA
+pK <- 101/(101+328); pK
+
+
+
+(98+141)*pA*(1-pA)
+(101+328)*pK*(1-pK) #Ergebnis ist über 9
