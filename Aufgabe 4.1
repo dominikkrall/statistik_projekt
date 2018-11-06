@@ -1,0 +1,55 @@
+library(readr)
+library(carData)
+library(qqplotr)
+library(seqinr)
+library(gplots)
+library(car)
+
+diabetic <- read_table2("C:/Users/User/Desktop/Statistik/3.Semester/Projekt/diabetic.txt")
+head(diabetic)
+# dataframe
+# a) Datenbeschreibung
+boxplot(diabetic$albumin ~ diabetic$group, names=c("Group Alloxan", "Group Alloxan Insulin", "Group Normal" ))
+plotmeans(diabetic$albumin ~ diabetic$group, xlab="Groups")
+
+
+nn <- aggregate(diabetic$albumin, by=list(diabetic$group), length); nn <- nn$x; nn 
+sapply(list(diabetic$albumin[1:18], diabetic$albumin[19:36], diabetic$albumin[37:54]), shapiro.test)
+mw <- aggregate(diabetic$albumin, by=list(diabetic$group), mean); mw <- mw$x; mw
+s <- aggregate(diabetic$albumin, by=list(diabetic$group), sd); s <- s$x; s
+A <- cbind(nn,mw,s); colnames(A) <- c("n", "xquer", "s" ); A
+
+
+# b) ANOVA-Tafel, Globaltest
+# H0: alle StufenMW sind gleich
+ANOV <- factor(diabetic$group)
+mod <- aov(diabetic$albumin ~ ANOV); modsum <- summary(mod); modsum
+# Normalverteilte Residuen ?
+# H0: Residuen widersprechen nicht der Normalverteilungsannahme
+shapiro.test(mod$residuals)
+# P >= 0.05 --> Residuen mit H0 vereinbar!
+# p < 0.05 -> H0 ablehnen
+
+# Homogene (d.h. gleiche) Varianzen auf den Faktorstufen ?
+# H0: Varianzen sind gleich
+# H1: Varianzen sind ungleich
+# H1 gilt
+
+
+# c) Varianzen gleich?
+# Levenetest (Befehl levenetest, nicht levene.test)
+leveneTest(mod)
+# pwert 0.49, varianzen kann man als gleich sehen
+
+# P >= 0.05 --> Daten sprechen nicht gegen H0!
+# c2) WiederholSTD, Wiederholgrenze
+MQE <- modsum[[1]][2,3] # Schätzwert für Fehlervarianz
+sr <- sqrt(MQE) # Wiederholstandardabweichung
+r <- sr*qnorm(0.975)*sqrt(2) # Wiederholgrenze, ist die Grenze um die sich 2 werte 
+# unterscheiden dürfen (max 5% der Werte überschreiten diese grenze -> auffällig wenn über Grenze)
+print(cbind(sr, r))
+
+# d) multipler Mittelwertvergleich
+TukeyHSD(mod)
+# alle möglichen paare an mittelwerte werden verglichen
+# alle mit pwert unter 5% sind signifikant unterschieden
