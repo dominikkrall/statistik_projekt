@@ -8,7 +8,13 @@ petbirds <- read_table2("C:/Users/User/Desktop/Statistik/3.Semester/Projekt/petb
 # Dataframe
 attach(petbirds)
 table(Gruppe)
-table(Vogel, Gruppe)
+abs <- table(Vogel, Gruppe)
+abs[1,1] #hielt keinen vogel, fall
+h11 <- abs[2,1] #hielt Vogel, fall
+abs[1,2] #hielt keinen vogel, kontrolle
+h12 <- abs[2,2] #hielt Vogel, kontrolle
+n1 <- abs[1,1]+abs[2,1]
+n2 <- abs[1,2]+abs[2,2]
 
 # K = kontrolle
 # A = Fall
@@ -19,3 +25,15 @@ pK <- 101/(101+328); pK
 
 (98+141)*pA*(1-pA)
 (101+328)*pK*(1-pK) #Ergebnis ist über 9
+
+# a) H0: p1 = p2 vs. H1: p1 =! p2
+Pprop <- prop.test(c(h11, h12), c(n1, n2))
+
+# pwert unter 5% -> h0 ablehnen
+y2 <- h12/n2
+p2 <- y2; p1 <- p2-0.1
+power.prop.test(n=239, p1=p1,p2=p2)
+
+
+
+
