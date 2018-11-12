@@ -4,6 +4,7 @@ library(qqplotr)
 library(seqinr)
 library(gplots)
 library(car)
+library(extRemes)
 
 diabetic <- read_table2("C:/Users/User/Desktop/Statistik/3.Semester/Projekt/diabetic.txt")
 head(diabetic)
@@ -26,9 +27,17 @@ ANOV <- factor(diabetic$group)
 mod <- aov(diabetic$albumin ~ ANOV); modsum <- summary(mod); modsum
 # Normalverteilte Residuen ?
 # H0: Residuen widersprechen nicht der Normalverteilungsannahme
+r <- mod$residuals
 shapiro.test(mod$residuals)
 # P >= 0.05 --> Residuen mit H0 vereinbar!
 # p < 0.05 -> H0 ablehnen
+# Residuen nicht normal verteilt!
+
+# Residuen nach QQ-Plot
+
+
+qqnorm(r, main = "QQ-Plot Residuen")
+qqline(r)
 
 # Homogene (d.h. gleiche) Varianzen auf den Faktorstufen ?
 # H0: Varianzen sind gleich
@@ -53,3 +62,22 @@ print(cbind(sr, r))
 TukeyHSD(mod)
 # alle möglichen paare an mittelwerte werden verglichen
 # alle mit pwert unter 5% sind signifikant unterschieden
+
+
+
+# d) ANOVA-Tafel, Globaltest
+# mit transformierten Daten
+# H0: alle StufenMW sind gleich
+ANOV <- factor(diabetic$group)
+mod2 <- aov(log(diabetic$albumin) ~ ANOV); modsum2 <- summary(mod2); modsum2
+# Normalverteilte Residuen ?
+# H0: Residuen widersprechen nicht der Normalverteilungsannahme
+r2 <- mod2$residuals
+shapiro.test(r2)
+# Nach logarithmierung sind die Residuen normalverteilt
+qqnorm(r2, main = "QQ-Plot Residuen")
+qqline(r2)
+
+TukeyHSD(mod2)
+
+
