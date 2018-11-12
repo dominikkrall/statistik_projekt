@@ -4,10 +4,13 @@ library(qqplotr)
 library(seqinr)
 library(gplots)
 library(car)
+library(ggplot2)
+library(scales)
 
 oysters <- read_delim("C:/Users/User/Desktop/Statistik/3.Semester/Projekt/oysters.txt", 
                                   "\t", escape_double = FALSE, trim_ws = TRUE)
 head(oysters)
+attach(oysters)
 # Data frame
 # 1 = 2D
 # 2 = 3D
@@ -45,6 +48,32 @@ cc2 <- predict(mod2,oysters, interval = "confidence")
 lines(x,cc2[,2], col="red") # fügt die untergrenze ein
 lines(x,cc2[,3],col="red") #fügt die obergrenze ein
 
+
+# Evt schönere Grafik:
+
+scientific_10 <- function(x) {
+  parse(text=gsub("e", " %*% 10^", scales::scientific_format()(x)))
+}
+
+mydata <- cbind(oysters, cc1)
+p <- ggplot(mydata,aes(x,y1)) +
+  geom_point() +
+  stat_smooth(method = lm) + ggtitle("Streudiagramm 2D") +
+  xlab("Volumen [ml]") + ylab("Pixel 2D")
+
+# 3. Add prediction intervals
+p + geom_line(aes(y = cc1[,2]), color = "red", linetype = "dashed")+
+  geom_line(aes(y = cc1[,3]), color = "red", linetype = "dashed") +scale_y_continuous(label=scientific_10)
+
+
+mydata <- cbind(oysters, cc2)
+p <- ggplot(mydata,aes(x,y2)) +
+  geom_point() +
+  stat_smooth(method = lm) + ggtitle("Streudiagramm 3D") +
+  xlab("Volumen [ml]") + ylab("Pixel 3D")
+# 3. Add prediction intervals
+p + geom_line(aes(y = cc2[,2]), color = "red", linetype = "dashed")+
+  geom_line(aes(y = cc2[,3]), color = "red", linetype = "dashed") +scale_y_continuous(label=scientific_10)
 
 # 2D Berechnung
 
